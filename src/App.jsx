@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Home from './views/Home';
 import Punks from './views/Punks';
+import Punk from './views/Punk';
 import Web3 from "web3/dist/web3.min";
 
 const App = () => {
@@ -29,6 +30,7 @@ const App = () => {
     <Routes>
       <Route path="/" exact element={<Home />} />
       <Route path="/punks" exact element={<Punks />} />
+      <Route path="/punks/:tokenId" exact element={<Punk />} />
     </Routes>
   </MainLayout>)
 }

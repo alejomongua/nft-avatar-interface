@@ -4,6 +4,7 @@ import Loading from '../components/Loading'
 import RequestAccess from '../components/RequestAccess'
 import { read } from '@popperjs/core'
 import { usePlatziPunksData } from '../hooks/usePlatziPunksData'
+import { Link } from 'react-router-dom'
 
 const Punks = () => {
     const { active } = useWeb3React()
@@ -16,8 +17,10 @@ const Punks = () => {
             loading ? <Loading />
                 : <div className='grid gap-4 grid-cols-3'>
                     {
-                        punks.map(({ name, tokenId, image }) =>
-                            <PunkCard key={tokenId} image={image} name={name} />
+                        punks.map(({ name, image }, tokenId) =>
+                            <Link key={tokenId} to={`/punks/${tokenId}`}>
+                                <PunkCard image={image} name={name} />
+                            </Link>
                         )
                     }
                 </div>

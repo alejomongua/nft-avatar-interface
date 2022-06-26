@@ -8,6 +8,12 @@ const getPunkData = async ({ platziPunks, tokenId }) => {
         tokenURI,
         tokenDNA,
         owner,
+    ] = await Promise.all([
+        platziPunks.methods.tokenURI(tokenId).call(),
+        platziPunks.methods.tokenDNA(tokenId).call(),
+        platziPunks.methods.ownerOf(tokenId).call(),
+    ])
+    const [
         accessoriesType,
         clotheColor,
         clotheType,
@@ -22,22 +28,19 @@ const getPunkData = async ({ platziPunks, tokenId }) => {
         skinColor,
         topType,
     ] = await Promise.all([
-        platziPunks.methods.tokenURI(tokenId).call(),
-        platziPunks.methods.tokenDNA(tokenId).call(),
-        platziPunks.methods.ownerOf(tokenId).call(),
-        platziPunks.methods.getAccessoriesType(tokenId).call(),
-        platziPunks.methods.getClotheColor(tokenId).call(),
-        platziPunks.methods.getClotheType(tokenId).call(),
-        platziPunks.methods.getEyeType(tokenId).call(),
-        platziPunks.methods.getEyeBrowType(tokenId).call(),
-        platziPunks.methods.getFacialHairColor(tokenId).call(),
-        platziPunks.methods.getFacialHairType(tokenId).call(),
-        platziPunks.methods.getHairColor(tokenId).call(),
-        platziPunks.methods.getHatColor(tokenId).call(),
-        platziPunks.methods.getGraphicType(tokenId).call(),
-        platziPunks.methods.getMouthType(tokenId).call(),
-        platziPunks.methods.getSkinColor(tokenId).call(),
-        platziPunks.methods.getTopType(tokenId).call(),
+        platziPunks.methods.getAccessoriesType(tokenDNA).call(),
+        platziPunks.methods.getClotheColor(tokenDNA).call(),
+        platziPunks.methods.getClotheType(tokenDNA).call(),
+        platziPunks.methods.getEyeType(tokenDNA).call(),
+        platziPunks.methods.getEyeBrowType(tokenDNA).call(),
+        platziPunks.methods.getFacialHairColor(tokenDNA).call(),
+        platziPunks.methods.getFacialHairType(tokenDNA).call(),
+        platziPunks.methods.getHairColor(tokenDNA).call(),
+        platziPunks.methods.getHatColor(tokenDNA).call(),
+        platziPunks.methods.getGraphicType(tokenDNA).call(),
+        platziPunks.methods.getMouthType(tokenDNA).call(),
+        platziPunks.methods.getSkinColor(tokenDNA).call(),
+        platziPunks.methods.getTopType(tokenDNA).call(),
     ])
 
     const responseMetadata = await fetch(tokenURI)
@@ -91,6 +94,30 @@ export const usePlatziPunksData = () => {
 
     return {
         punks,
+        loading,
+        update,
+    }
+}
+
+export const usePlatziPunkData = tokenId => {
+    const [punk, setPunk] = useState([])
+    const [loading, isLoading] = useState(true)
+    const platziPunks = usePlatziPunks()
+
+    const update = useCallback(async () => {
+        if (platziPunks && (tokenId || tokenId == 0)) {
+            isLoading(true)
+            const singlePunk = await getPunkData({ platziPunks, tokenId })
+
+            setPunk(singlePunk)
+            isLoading(false)
+        }
+    }, [platziPunks])
+
+    useEffect(() => { update() }, [update])
+
+    return {
+        punk,
         loading,
         update,
     }
