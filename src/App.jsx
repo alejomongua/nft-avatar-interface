@@ -2,6 +2,7 @@ import MainLayout from './layouts/main/MainLayout'
 import { useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Home from './views/Home';
+import Punks from './views/Punks';
 import Web3 from "web3/dist/web3.min";
 
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
   return (<MainLayout>
     <Routes>
       <Route path="/" exact element={<Home />} />
+      <Route path="/punks" exact element={<Punks />} />
     </Routes>
   </MainLayout>)
 }

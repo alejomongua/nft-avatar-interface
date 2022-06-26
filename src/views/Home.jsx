@@ -6,6 +6,7 @@ import {
     Button,
     Image,
     Badge,
+    useToast,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { useWeb3React } from "@web3-react/core";
@@ -13,13 +14,20 @@ import { usePlatziPunks } from "../hooks/usePlatziPunks";
 import { useCallback, useEffect, useState } from "react";
 
 const Home = () => {
+    const [isMinting, setIsMinting] = useState(false);
     const [imageSrc, setImageSrc] = useState("");
+    const [totalSupply, setTotalSupply] = useState(0);
+    const [maxSupply, setMaxSupply] = useState(10000);
     const { active, account } = useWeb3React();
     const platziPunks = usePlatziPunks();
+    const toast = useToast()
 
     const getPlatziPunksData = useCallback(async () => {
         if (platziPunks) {
             const totalSupply = await platziPunks.methods.totalSupply().call();
+            setTotalSupply(parseInt(totalSupply, 10))
+            const maxSupply = await platziPunks.methods.maxSupply().call();
+            setMaxSupply(maxSupply)
             const dnaPreview = await platziPunks.methods
                 .deterministricPseudoRandomDNA(totalSupply, account)
                 .call();
@@ -32,6 +40,39 @@ const Home = () => {
         getPlatziPunksData();
     }, [getPlatziPunksData]);
 
+    const mint = () => {
+        setIsMinting(true)
+        platziPunks.methods
+            .mint()
+            .send({ from: account })
+            .on("transactionHash", txHash => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction send",
+                    description: `Transaction hash: ${txHash}`,
+                    status: 'info'
+                })
+            })
+            .on("receipt", () => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction receipt",
+                    description: "New token minted",
+                    status: 'success'
+                })
+                setIsMinting(false)
+            })
+            .on("error", error => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction failed",
+                    description: error.message,
+                    status: 'error'
+                })
+
+                setIsMinting(false)
+            })
+    }
     return (
         <Stack
             align={"center"}
@@ -55,23 +96,23 @@ const Home = () => {
                             position: "absolute",
                             bottom: 1,
                             left: 0,
-                            bg: "green.400",
+                            bg: "blue.400",
                             zIndex: -1,
                         }}
                     >
                         Un Platzi Punk
                     </Text>
                     <br />
-                    <Text as={"span"} color={"green.400"}>
+                    <Text as={"span"} color={"blue.400"}>
                         nunca para de aprender
                     </Text>
                 </Heading>
                 <Text color={"gray.500"}>
-                    Platzi Punks es una colección de Avatares randomizados cuya metadata
-                    es almacenada on-chain. Poseen características únicas y sólo hay 10000
-                    en existencia.
+                    Platzi Punks es una colección de Avatares alatorios cuya metadata
+                    es almacenada on-chain. Poseen características únicas y solo
+                    hay {maxSupply} en existencia.
                 </Text>
-                <Text color={"green.500"}>
+                <Text color={"blue.500"}>
                     Cada Platzi Punk se genera de forma secuencial basado en tu address,
                     usa el previsualizador para averiguar cuál sería tu Platzi Punk si
                     minteas en este momento
@@ -85,10 +126,12 @@ const Home = () => {
                         size={"lg"}
                         fontWeight={"normal"}
                         px={6}
-                        colorScheme={"green"}
-                        bg={"green.400"}
-                        _hover={{ bg: "green.500" }}
+                        colorScheme={"blue"}
+                        bg={"blue.400"}
+                        _hover={{ bg: "blue.500" }}
                         disabled={!platziPunks}
+                        onClick={mint}
+                        isLoading={isMinting}
                     >
                         Obtén tu punk
                     </Button>
@@ -113,13 +156,13 @@ const Home = () => {
                         <Flex mt={2}>
                             <Badge>
                                 Next ID:
-                                <Badge ml={1} colorScheme="green">
-                                    1
+                                <Badge ml={1} colorScheme="blue">
+                                    {totalSupply + 1}
                                 </Badge>
                             </Badge>
                             <Badge ml={2}>
                                 Address:
-                                <Badge ml={1} colorScheme="green">
+                                <Badge ml={1} colorScheme="blue">
                                     0x0000...0000
                                 </Badge>
                             </Badge>
@@ -128,7 +171,7 @@ const Home = () => {
                             onClick={getPlatziPunksData}
                             mt={4}
                             size="xs"
-                            colorScheme="green"
+                            colorScheme="blue"
                         >
                             Actualizar
                         </Button>
