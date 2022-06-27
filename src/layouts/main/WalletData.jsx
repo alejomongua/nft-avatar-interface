@@ -41,7 +41,7 @@ const WalletData = () => {
       {active ? (
         <div className="flex rounded-full bg-blue-200 px-2 py-1">
           <div>
-            <Link to="/punks">{truncatedAddress}</Link>
+            <Link to={`/punks?address=${account}`}>{truncatedAddress}</Link>
           </div>
           <div className='bg-gray-500 text-white px-2 ml-2'>
             ~{balance} Ξ

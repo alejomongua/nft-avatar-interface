@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
-import PlatziPunksArtifact from '../config/artifacts/PlatziPunks'
+
+// import PlatziPunksArtifact from '../config/artifacts/PlatziPunks'
 import { usePlatziPunks } from "./usePlatziPunks";
 
 const getPunkData = async ({ platziPunks, tokenId }) => {
@@ -69,26 +70,39 @@ const getPunkData = async ({ platziPunks, tokenId }) => {
     }
 }
 
-export const usePlatziPunksData = () => {
+export const usePlatziPunksData = owner => {
+    const { library } = useWeb3React()
     const [punks, setPunks] = useState([])
     const [loading, isLoading] = useState(true)
     const platziPunks = usePlatziPunks()
 
     const update = useCallback(async () => {
         if (platziPunks) {
+            let punks
             isLoading(true)
-            let totalSupply = await platziPunks.methods.totalSupply().call()
-            totalSupply = parseInt(totalSupply, 10)
-            const punks = await Promise.all(new Array(totalSupply)
-                .fill()
-                .map((_, index) => index)
-                .map(tokenId => getPunkData({ platziPunks, tokenId }))
-            )
+            if (library.utils.isAddress(owner)) {
+                let balanceOfOwner = await platziPunks.methods.balanceOf(owner).call()
+                balanceOfOwner = parseInt(balanceOfOwner, 10)
+                const tokenIds = await Promise.all(new Array(balanceOfOwner)
+                    .fill()
+                    .map((_, index) => platziPunks.methods.tokenOfOwnerByIndex(owner, index).call())
+                )
+
+                punks = await Promise.all(tokenIds.map(tokenId => getPunkData({ platziPunks, tokenId })))
+            } else {
+                let totalSupply = await platziPunks.methods.totalSupply().call()
+                totalSupply = parseInt(totalSupply, 10)
+                punks = await Promise.all(new Array(totalSupply)
+                    .fill()
+                    .map((_, index) => index)
+                    .map(tokenId => getPunkData({ platziPunks, tokenId }))
+                )
+            }
 
             setPunks(punks)
             isLoading(false)
         }
-    }, [platziPunks])
+    }, [platziPunks, owner, library])
 
     useEffect(() => { update() }, [update])
 

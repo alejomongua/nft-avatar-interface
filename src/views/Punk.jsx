@@ -1,15 +1,21 @@
+import { useParams } from 'react-router-dom'
+import { Button, useToast } from '@chakra-ui/react'
+import { useState } from 'react'
 import { useWeb3React } from '@web3-react/core'
+
 import PunkCard from '../components/PunkCard'
 import Loading from '../components/Loading'
 import RequestAccess from '../components/RequestAccess'
 import { usePlatziPunkData } from '../hooks/usePlatziPunksData'
-import { useParams } from 'react-router-dom'
-import { Button } from '@chakra-ui/react'
+import { usePlatziPunks } from "../hooks/usePlatziPunks";
 
 const Punk = () => {
     const { tokenId } = useParams()
-    const { account, active } = useWeb3React()
-    const { punk, loading } = usePlatziPunkData(tokenId)
+    const { account, active, library } = useWeb3React()
+    const { punk, loading, update } = usePlatziPunkData(tokenId)
+    const [transfering, setTransfering] = useState(false)
+    const platziPunks = usePlatziPunks();
+    const toast = useToast()
     const {
         image,
         name,
@@ -17,6 +23,58 @@ const Punk = () => {
         owner,
         attributes,
     } = punk
+
+
+    const transfer = async () => {
+        setTransfering(true)
+        const address = prompt('Paste destination address')
+        const isAddress = library.utils.isAddress(address)
+        if (!isAddress) {
+            toast({
+                title: 'Wrong address',
+                description: `Input address ${address} is not a valid ethereum address`,
+                status: 'error',
+            })
+            setTransfering(false)
+            return
+        }
+        platziPunks.methods
+            .safeTransferFrom(
+                account, // _from
+                address, // _to
+                tokenId // _tokenId
+            )
+            .send({ from: account })
+            .on("transactionHash", txHash => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction send",
+                    description: `Transaction hash: ${txHash}`,
+                    status: 'info'
+                })
+            })
+            .on("receipt", () => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction receipt",
+                    description: `Transfered successfully, ${punk.name} now belongs to ${address}`,
+                    status: 'success'
+                })
+                setTransfering(false)
+                update()
+            })
+            .on("error", error => {
+                toast({
+                    duration: 3000,
+                    title: "Transaction failed",
+                    description: error.message,
+                    status: 'error'
+                })
+
+                setTransfering(false)
+            })
+
+    }
 
     if (!active) { return <RequestAccess></RequestAccess> }
 
@@ -30,6 +88,8 @@ const Punk = () => {
                             colorScheme={"green"}
                             disabled={account != owner}
                             className="my-4"
+                            isLoading={transfering}
+                            onClick={transfer}
                         >
                             {
                                 account != owner ?
