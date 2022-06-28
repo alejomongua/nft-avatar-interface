@@ -1,41 +1,23 @@
-import {
-  Box,
-  Container,
-  Stack,
-  Text,
-  Link,
-  useColorModeValue,
-} from "@chakra-ui/react";
-
 const Footer = () => {
   return (
-    <Box
-      bg={useColorModeValue("white", "gray.800")}
-      color={useColorModeValue("gray.700", "gray.200")}
+    <div
+      className="bg-gray-300 text-gray-500"
     >
-      <Box
-        borderTopWidth={1}
-        borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.700")}
+      <div
+        className="mx-auto my-4 container"
       >
-        <Container
-          as={Stack}
-          maxW={"6xl"}
-          py={4}
-          direction={{ base: "column", md: "row" }}
-          spacing={4}
-          justify={{ base: "center", md: "space-between" }}
-          align={{ base: "center", md: "center" }}
-        >
-          <Text>
-            © {new Date().getFullYear()} Original designs by
-            <Link ml={1} href="https://twitter.com/pablostanley">
-              Pablo Stanley 🎨
-            </Link>
-          </Text>
-        </Container>
-      </Box>
-    </Box>
+        <p>
+          © {new Date().getFullYear()} Original designs by
+          <a className="mx-1" href="https://twitter.com/pablostanley">
+            Pablo Stanley 🎨
+          </a>
+          - Programed by
+          <a className="mx-1" href="https://github.com/alejomongua">
+            Alejandro Mongua 🤓
+          </a> in 2022
+        </p>
+      </div>
+    </div>
   );
 };
 

@@ -100,22 +100,22 @@ const Home = () => {
                             zIndex: -1,
                         }}
                     >
-                        Un Platzi Punk
+                        A Platzi Punk
                     </Text>
                     <br />
                     <Text as={"span"} color={"blue.400"}>
-                        nunca para de aprender
+                        never stops learning
                     </Text>
                 </Heading>
                 <Text color={"gray.500"}>
-                    Platzi Punks es una colección de Avatares alatorios cuya metadata
-                    es almacenada on-chain. Poseen características únicas y solo
-                    hay {maxSupply} en existencia.
+                    Platzi Punks is a random Avatar collection whose metadata
+                    is stored on-chain. Each one has unique caracteristics and there
+                    will ever be a max of {maxSupply}.
                 </Text>
                 <Text color={"blue.500"}>
-                    Cada Platzi Punk se genera de forma secuencial basado en tu address,
-                    usa el previsualizador para averiguar cuál sería tu Platzi Punk si
-                    minteas en este momento
+                    Each Platzi Punk is generated from a random number based in the minter address,
+                    you can use the previzualizer to see which one you will have if you
+                    mint it right now.
                 </Text>
                 <Stack
                     spacing={{ base: 4, sm: 6 }}
@@ -133,11 +133,11 @@ const Home = () => {
                         onClick={mint}
                         isLoading={isMinting}
                     >
-                        Obtén tu punk
+                        Get your punk
                     </Button>
                     <Link to="/punks">
                         <Button rounded={"full"} size={"lg"} fontWeight={"normal"} px={6}>
-                            Galería
+                            Gallery
                         </Button>
                     </Link>
                 </Stack>
@@ -173,11 +173,11 @@ const Home = () => {
                             size="xs"
                             colorScheme="blue"
                         >
-                            Actualizar
+                            Update
                         </Button>
                     </>
                 ) : (
-                    <Badge mt={2}>Wallet desconectado</Badge>
+                    <Badge mt={2}>Wallet disconnected</Badge>
                 )}
             </Flex>
         </Stack>

@@ -24,6 +24,10 @@ const Links = [
     name: "Punks",
     to: "/punks",
   },
+  {
+    name: "About",
+    to: "/about",
+  },
 ];
 
 const MainLayout = ({ children }) => {
